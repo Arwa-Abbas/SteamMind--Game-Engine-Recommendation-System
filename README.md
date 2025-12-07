@@ -1,6 +1,8 @@
-# SteamMind – Game Engine Recommendation System
+# SteamMind – Game Engine Recommendation System 
 
 A professional game recommendation system using **knowledge-based (constraint-based)** and **content-based filtering**, built with **FastAPI** and **MongoDB**.
+---
+
 Dataset Used: https://www.kaggle.com/datasets/nikatomashvili/steam-games-dataset
 ---
 
@@ -131,6 +133,14 @@ Measures linear correlation (-1 → 1).
 Gaussian-based inverse distance.
 ### Jaccard Similarity
 Set overlap for binary features.
+
+### Memory Efficiency
+
+Sparse TF-IDF (max 800 features)
+Top-K similarity storage
+Chunked processing
+Float16 / UInt16 compression
+Fallback mechanisms for missing data
 
 ---
 

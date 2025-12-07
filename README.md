@@ -1,4 +1,4 @@
-# SteamMind – Game Engine Recommendation System 
+# SteamMind – Game Engine Recommendation System #
 
 A professional game recommendation system using **knowledge-based (constraint-based)** and **content-based filtering**, built with **FastAPI** and **MongoDB**.
 ---

@@ -485,7 +485,8 @@ def get_stats():
                 "avg_price": {"$avg": "$discounted_price"},
                 "max_price": {"$max": "$discounted_price"},
                 "min_price": {"$min": "$discounted_price"},
-                "free_games": {"$sum": {"$cond": [{"$eq": ["$discounted_price", 0]}, 1, 0]}}
+                "free_games": {"$sum": {"$cond": [{"$eq": ["$discounted_price", 0]}, 1, 0]}},
+                "discounted_games": {"$sum": {"$cond": [{"$gt": ["$discount_percentage", 0]}, 1, 0]}}
             }}
         ]))
         

@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import GameLoadingScreen from './components/GameLoadingScreen';
+import { 
+  FaGamepad, FaHeart, FaRegHeart, FaSearch, FaStar, FaEdit, 
+  FaBullseye, FaCog, FaRandom, FaMoneyBillWave, FaTag, 
+  FaLanguage, FaDesktop, FaDatabase, FaChartBar, FaUsers,
+  FaChartLine, FaDollarSign, FaGem, FaCrown, FaTags,
+  FaRobot, FaCogs, FaBrain, FaSyncAlt, FaFilter,
+  FaCloud, FaCheckCircle, FaClipboardList
+} from 'react-icons/fa';
+import { GiCrossedSwords } from 'react-icons/gi';
+import { BsController } from 'react-icons/bs';
 
 const API_BASE = 'http://localhost:8000';
 
@@ -17,8 +28,7 @@ function App() {
   // Game details modal
   const [selectedGame, setSelectedGame] = useState(null);
   const [showGameDetails, setShowGameDetails] = useState(false);
-  
-  // Available options from backend
+
   const [availableTags, setAvailableTags] = useState([]);
   const [availableLanguages, setAvailableLanguages] = useState([]);
   const [availableDevelopers, setAvailableDevelopers] = useState([]);
@@ -103,7 +113,7 @@ function App() {
     return `https://via.placeholder.com/460x215/${color}/ffffff?text=${encodedTitle}`;
   };
 
-  // Get better game images
+  
   const getSteamImages = (game) => {
     const appId = extractSteamAppId(game?.link);
     if (!appId) return { header: null, capsule: null };
@@ -116,7 +126,7 @@ function App() {
     };
   };
 
-  // Load liked games from storage on mount
+
   useEffect(() => {
     const stored = localStorage.getItem('likedGames');
     if (stored) {
@@ -129,7 +139,7 @@ function App() {
     loadInitialData();
   }, []);
 
-  // Save liked games to storage whenever they change
+  
   useEffect(() => {
     localStorage.setItem('likedGames', JSON.stringify(likedGames));
   }, [likedGames]);
@@ -190,12 +200,10 @@ function App() {
       setLoading(true);
       let url = `${API_BASE}/games?page=${page}&limit=24&sort_by=popularity_score&sort_order=-1`;
       
-      // Add game type filter if not 'all'
       if (type !== 'all') {
         url += `&game_type=${type}`;
       }
       
-      // Add sort parameter
       if (sortBy !== 'popularity') {
         const sortMap = {
           'alphabetical': 'title',
@@ -240,7 +248,7 @@ function App() {
       setLoading(true);
       let url = `${API_BASE}/games/search?q=${encodeURIComponent(searchQuery)}&limit=24`;
       
-      // Add game type filter if not 'all'
+      
       if (gameType !== 'all') {
         url += `&game_type=${gameType}`;
       }
@@ -489,11 +497,9 @@ function App() {
       const data = await response.json();
       console.log("Hybrid recommendations received:", data);
       
-      // FIXED: Process hybrid recommendations properly
       const recommendationsArray = data.recommendations || [];
       
       const formattedRecommendations = recommendationsArray.map(rec => {
-        // Ensure we have correct price data
         const price = rec.price || rec.discounted_price || 0;
         const originalPrice = rec.original_price || rec.price || price;
         
@@ -658,7 +664,7 @@ function App() {
             onClick={(e) => { e.stopPropagation(); toggleLike(game); }}
             title={liked ? 'Remove from liked' : 'Add to liked'}
           >
-            <span className="like-icon">{liked ? '❤️' : '🤍'}</span>
+           <span className="like-icon">{liked ? <FaHeart /> : <FaRegHeart />}</span>
           </button>
           
           {hasDiscount && gameData.discount_percentage > 0 && (
@@ -694,11 +700,11 @@ function App() {
           
           <div className="game-stats">
             <div className="stat" title="Rating">
-              <span className="stat-icon">⭐</span>
+              <span className="stat-icon"><FaStar /></span>
               <span>{Math.round((gameData.overall_sentiment_score || 0.5) * 100)}%</span>
             </div>
             <div className="stat" title="Reviews">
-              <span className="stat-icon">📝</span>
+              <span className="stat-icon"><FaEdit /></span>
               <span>{(gameData.all_reviews_count || 0).toLocaleString()}</span>
             </div>
           </div>
@@ -757,7 +763,7 @@ function App() {
     );
   };
 
-  // Render Game Details Modal
+
   const renderGameDetailsModal = () => {
     if (!selectedGame) return null;
     
@@ -797,7 +803,7 @@ function App() {
                       <span className="badge-hero discount">-{Math.round(selectedGame.discount_percentage || 0)}% OFF</span>
                     )}
                     <span className="badge-hero rating">
-                      ⭐ {Math.round((selectedGame.overall_sentiment_score || 0.5) * 100)}%
+                      <FaStar /> {Math.round((selectedGame.overall_sentiment_score || 0.5) * 100)}%
                     </span>
                   </div>
                   
@@ -819,7 +825,7 @@ function App() {
                       className={`btn-hero like ${liked ? 'liked' : ''}`}
                       onClick={() => toggleLike(selectedGame)}
                     >
-                      <span className="btn-icon">{liked ? '❤️' : '🤍'}</span>
+                      <span className="btn-icon">{liked ? <FaHeart /> : <FaRegHeart />}</span>
                       <span>{liked ? 'Liked' : 'Like'}</span>
                     </button>
                     
@@ -937,7 +943,7 @@ function App() {
                       <div className="features-container">
                         {selectedGame.features.map((feature, index) => (
                           <div key={index} className="feature-detail">
-                            <span className="feature-icon">✓</span>
+                            <span className="feature-icon"><FaCheckCircle /></span>
                             <span>{feature}</span>
                           </div>
                         ))}
@@ -964,7 +970,7 @@ function App() {
     );
   };
 
-  // Render pagination controls
+  
   const renderPagination = () => {
     if (totalPages <= 1) return null;
     
@@ -1037,103 +1043,8 @@ function App() {
     );
   };
 
-  // Render Stats Charts
-  const renderStatsCharts = () => {
-    if (!stats) return null;
-    
-    const priceStats = stats.database.price_statistics || {};
-    const topTags = stats.database.top_tags || [];
-    
-    // Create price distribution data
-    const priceDistribution = [
-      { range: 'Free', count: priceStats.free_games || 0 },
-      { range: '$0-$10', count: priceStats.under_10 || 0 },
-      { range: '$10-$20', count: priceStats.under_20 || 0 },
-      { range: '$20-$50', count: priceStats.under_50 || 0 },
-      { range: '$50+', count: priceStats.over_50 || 0 }
-    ];
-    
-    // Create top 10 tags for chart
-    const top10Tags = topTags.slice(0, 10);
-    
-    return (
-      <div className="stats-dashboard">
-        <div className="stats-row">
-          <div className="stat-chart">
-            <h4>Price Distribution</h4>
-            <div className="chart-container">
-              {priceDistribution.map((item, index) => (
-                <div key={index} className="chart-bar">
-                  <div className="bar-label">{item.range}</div>
-                  <div className="bar-track">
-                    <div 
-                      className="bar-fill" 
-                      style={{ 
-                        width: `${Math.max(5, (item.count / priceDistribution[0].count) * 100)}%`,
-                        backgroundColor: index === 0 ? '#10b981' : 
-                                        index === 1 ? '#3b82f6' : 
-                                        index === 2 ? '#8b5cf6' : 
-                                        index === 3 ? '#ec4899' : '#f59e0b'
-                      }}
-                    ></div>
-                  </div>
-                  <div className="bar-value">{item.count.toLocaleString()}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div className="stat-chart">
-            <h4>Top Tags</h4>
-            <div className="chart-container">
-              {top10Tags.map((tag, index) => (
-                <div key={index} className="chart-bar">
-                  <div className="bar-label">{tag._id}</div>
-                  <div className="bar-track">
-                    <div 
-                      className="bar-fill" 
-                      style={{ 
-                        width: `${(tag.count / top10Tags[0].count) * 100}%`,
-                        backgroundColor: `hsl(${index * 36}, 70%, 50%)`
-                      }}
-                    ></div>
-                  </div>
-                  <div className="bar-value">{tag.count.toLocaleString()}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Initial loading screen
   if (initialLoading) {
-    return (
-      <div className="initial-loading-screen">
-        <div className="loading-content">
-          <div className="loading-logo">
-            <h1>SteamUp!</h1>
-            <p>Your Ultimate Game Discovery Platform</p>
-          </div>
-          <div className="loading-spinner">
-            <div className="spinner-ring"></div>
-            <div className="spinner-ring"></div>
-            <div className="spinner-ring"></div>
-            <div className="spinner-ring"></div>
-          </div>
-          <div className="loading-text">
-            Loading your gaming universe...
-          </div>
-          <div className="loading-progress">
-            <div className="progress-bar">
-              <div className="progress-fill"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <GameLoadingScreen />;
   }
 
   return (
@@ -1189,7 +1100,7 @@ function App() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="search-input"
                   />
-                  <button type="submit" className="search-btn">🔍</button>
+                  <button type="submit" className="search-btn"><FaSearch /></button>
                 </form>
                 
                 <div className="game-type-selector">
@@ -1252,7 +1163,7 @@ function App() {
                 
                 {games.length === 0 && (
                   <div className="empty-state">
-                    <div className="empty-icon">🎮</div>
+                    <div className="empty-icon"><FaGamepad /></div>
                     <h3>No games found</h3>
                     <p>Try a different search or game type filter</p>
                   </div>
@@ -1274,7 +1185,7 @@ function App() {
             
             {likedGames.length === 0 ? (
               <div className="empty-state">
-                <div className="empty-icon">📋</div>
+                <div className="empty-icon"><FaClipboardList /></div>
                 <h3>No liked games yet</h3>
                 <p>Start exploring and click the heart icon on games you like!</p>
                 <button onClick={() => setActiveTab('explore')} className="btn-primary">
@@ -1304,7 +1215,7 @@ function App() {
             </div>
             
             <button onClick={getContentRecommendations} className="btn-primary" disabled={likedGames.length === 0}>
-              🔍 Get Recommendations Based on Liked Games
+              <FaSearch /> Get Recommendations Based on Liked Games
             </button>
             
             {loading ? (
@@ -1351,7 +1262,7 @@ function App() {
                  recommendations.data.results.moderately_similar?.games?.length === 0 && 
                  recommendations.data.results.somewhat_similar?.games?.length === 0 && (
                   <div className="empty-state">
-                    <div className="empty-icon">🔍</div>
+                    <div className="empty-icon"><FaSearch /></div>
                     <h3>No similar games found</h3>
                     <p>Try liking different games or change similarity method.</p>
                   </div>
@@ -1359,7 +1270,7 @@ function App() {
               </div>
             ) : (
               <div className="empty-state">
-                <div className="empty-icon">🔍</div>
+                <div className="empty-icon"><FaSearch /></div>
                 <h3>No recommendations yet</h3>
                 <p>Like some games and click the button above to get personalized recommendations!</p>
               </div>
@@ -1659,7 +1570,7 @@ function App() {
                  recommendations.data.results.good_matches?.games?.length === 0 && 
                  recommendations.data.results.partial_matches?.games?.length === 0 && (
                   <div className="empty-state">
-                    <div className="empty-icon">🎯</div>
+                    <div className="empty-icon"><FaBullseye /></div>
                     <h3>No matches found</h3>
                     <p>Try relaxing your constraints or select different preferences.</p>
                   </div>
@@ -1667,7 +1578,7 @@ function App() {
               </div>
             ) : (
               <div className="empty-state">
-                <div className="empty-icon">⚙️</div>
+                <div className="empty-icon"><FaCog /></div>
                 <h3>No recommendations yet</h3>
                 <p>Set your preferences and click the button above!</p>
               </div>
@@ -1690,7 +1601,7 @@ function App() {
             </div>
             
             <button onClick={getHybridRecommendations} className="btn-primary" disabled={likedGames.length === 0}>
-              🔀 Get Hybrid Recommendations
+              <FaRandom /> Get Hybrid Recommendations
             </button>
             
             {loading ? (
@@ -1709,7 +1620,7 @@ function App() {
               </div>
             ) : (
               <div className="empty-state">
-                <div className="empty-icon">🔀</div>
+                <div className="empty-icon"><FaRandom /></div>
                 <h3>No recommendations yet</h3>
                 <p>Like some games and set constraints, then click the button above!</p>
               </div>
@@ -1717,86 +1628,175 @@ function App() {
           </div>
         )}
 
-        {/* STATS TAB */}
+        {/* STATS TAB - PROFESSIONAL DASHBOARD */}
         {activeTab === 'stats' && stats && (
           <div className="tab-content">
             <div className="section-header">
-              <h2>Platform Statistics</h2>
+              <h2><FaChartBar /> Platform Analytics Dashboard</h2>
+              <p className="subtitle">Comprehensive insights into your gaming database</p>
             </div>
-            
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-icon">🎮</div>
-                <div className="stat-value">{stats.database.total_games}</div>
-                <div className="stat-label">Total Games</div>
-              </div>
-              
-              <div className="stat-card">
-                <div className="stat-icon">💰</div>
-                <div className="stat-value">${stats.database.price_statistics?.avg_price?.toFixed(2) || '0.00'}</div>
-                <div className="stat-label">Average Price</div>
-              </div>
-              
-              <div className="stat-card">
-                <div className="stat-icon">🆓</div>
-                <div className="stat-value">{stats.database.price_statistics?.free_games || 0}</div>
-                <div className="stat-label">Free Games</div>
-              </div>
-              
-              <div className="stat-card">
-                <div className="stat-icon">⭐</div>
-                <div className="stat-value">{Math.round((stats.database.average_sentiment || 0.5) * 100)}%</div>
-                <div className="stat-label">Avg Rating</div>
-              </div>
-              
-              <div className="stat-card">
-                <div className="stat-icon">💎</div>
-                <div className="stat-value">${stats.database.price_statistics?.max_price?.toFixed(2) || '0.00'}</div>
-                <div className="stat-label">Highest Price</div>
-              </div>
-              
-              <div className="stat-card">
-                <div className="stat-icon">📊</div>
-                <div className="stat-value">{stats.database.price_statistics?.discounted_games || 0}</div>
-                <div className="stat-label">Discounted Games</div>
-              </div>
-            </div>
-            
-            <div className="model-stats">
-              <h3>Model Information</h3>
-              <div className="stats-cards">
-                <div className="model-stat">
-                  <span className="label">Games Loaded:</span>
-                  <span className="value">{stats.model.games_loaded}</span>
+
+            {/* QUICK STATS CARDS */}
+            <div className="dashboard-header">
+              <div className="stats-summary">
+                <div className="summary-card">
+                  <div className="summary-icon"><FaDatabase /></div>
+                  <div className="summary-content">
+                    <h3>{stats.database.total_games?.toLocaleString()}</h3>
+                    <p>Total Games in Database</p>
+                  </div>
                 </div>
-                <div className="model-stat">
-                  <span className="label">Features:</span>
-                  <span className="value">{stats.model.feature_dimensions}</span>
+                <div className="summary-card">
+                  <div className="summary-icon"><FaUsers /></div>
+                  <div className="summary-content">
+                    <h3>{Math.round((stats.database.average_sentiment || 0.5) * 100)}%</h3>
+                    <p>Average User Rating</p>
+                  </div>
                 </div>
-                <div className="model-stat">
-                  <span className="label">Last Updated:</span>
-                  <span className="value">{new Date().toLocaleDateString()}</span>
+                <div className="summary-card">
+                  <div className="summary-icon"><FaTag /></div>
+                  <div className="summary-content">
+                    <h3>{stats.database.price_statistics?.free_games || 0}</h3>
+                    <p>Free-to-Play Titles</p>
+                  </div>
                 </div>
-                <div className="model-stat">
-                  <span className="label">Recommendation Models:</span>
-                  <span className="value">3</span>
+                <div className="summary-card">
+                  <div className="summary-icon"><FaChartLine /></div>
+                  <div className="summary-content">
+                    <h3>{stats.database.price_statistics?.discounted_games || 0}</h3>
+                    <p>Currently Discounted</p>
+                  </div>
                 </div>
               </div>
             </div>
-            
-            {/* Enhanced Stats Dashboard with Charts */}
-            {renderStatsCharts()}
-            
+
+            {/* TOP TAGS & CATEGORIES */}
+            <div className="dashboard-grid">
+              {/* TOP TAGS CHART */}
+              <div className="dashboard-card">
+                <div className="card-header">
+                  <h3><FaTags /> Most Popular Tags</h3>
+                  <span className="card-subtitle">Top 10 by frequency</span>
+                </div>
+                <div className="tags-chart">
+                  {stats.database.top_tags?.slice(0, 10).map((tag, index) => {
+                    const maxCount = stats.database.top_tags[0]?.count || 1;
+                    const width = (tag.count / maxCount) * 100;
+                    
+                    return (
+                      <div key={index} className="tag-row">
+                        <div className="tag-info">
+                          <span className="tag-name">{tag._id}</span>
+                          <span className="tag-count">{tag.count.toLocaleString()}</span>
+                        </div>
+                        <div className="tag-bar-container">
+                          <div 
+                            className="tag-bar" 
+                            style={{ 
+                              width: `${width}%`,
+                              backgroundColor: `hsl(${index * 36}, 70%, 50%)`
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* MODEL PERFORMANCE */}
+              <div className="dashboard-card">
+                <div className="card-header">
+                  <h3><FaRobot /> Model Performance</h3>
+                  <span className="card-subtitle">Recommendation System</span>
+                </div>
+                <div className="model-stats-grid">
+                  <div className="model-stat-item">
+                    <div className="model-stat-icon"><FaDatabase /></div>
+                    <div className="model-stat-content">
+                      <h4>{stats.model?.games_loaded || 0}</h4>
+                      <p>Games Loaded</p>
+                    </div>
+                  </div>
+                  <div className="model-stat-item">
+                    <div className="model-stat-icon"><FaCogs /></div>
+                    <div className="model-stat-content">
+                      <h4>{stats.model?.feature_dimensions || 800}</h4>
+                      <p>Feature Dimensions</p>
+                    </div>
+                  </div>
+                  <div className="model-stat-item">
+                    <div className="model-stat-icon"><FaBrain /></div>
+                    <div className="model-stat-content">
+                      <h4>3</h4>
+                      <p>Recommendation Models</p>
+                    </div>
+                  </div>
+                  <div className="model-stat-item">
+                    <div className="model-stat-icon"><FaSyncAlt /></div>
+                    <div className="model-stat-content">
+                      <h4>{new Date().toLocaleDateString()}</h4>
+                      <p>Last Updated</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="model-types">
+                  <div className="model-type">
+                    <div className="model-type-icon content"><FaSearch /></div>
+                    <div className="model-type-info">
+                      <h5>Content-Based</h5>
+                      <p>Cosine, Pearson, Euclidean, Jaccard</p>
+                    </div>
+                  </div>
+                  <div className="model-type">
+                    <div className="model-type-icon constraint"><FaFilter /></div>
+                    <div className="model-type-info">
+                      <h5>Constraint-Based</h5>
+                      <p>Price, Tags, System Specs</p>
+                    </div>
+                  </div>
+                  <div className="model-type">
+                    <div className="model-type-icon hybrid"><FaRandom /></div>
+                    <div className="model-type-info">
+                      <h5>Hybrid</h5>
+                      <p>Combined approach</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* TAGS CLOUD */}
             {stats.database.top_tags && (
-              <div className="tags-cloud">
-                <h3>Popular Tags</h3>
-                <div className="cloud">
-                  {stats.database.top_tags.slice(0, 30).map((tag, index) => (
-                    <span key={index} className="cloud-tag"
-                      style={{ fontSize: `${0.9 + (tag.count / stats.database.top_tags[0].count) * 0.8}em` }}>
-                      {tag._id} ({tag.count})
-                    </span>
-                  ))}
+              <div className="dashboard-section">
+                <div className="section-header-inline">
+                  <h3><FaCloud /> Tags Cloud</h3>
+                  <span className="section-subtitle">Interactive visualization of game tags</span>
+                </div>
+                <div className="tags-cloud-v2">
+                  {stats.database.top_tags.slice(0, 30).map((tag, index) => {
+                    const maxCount = stats.database.top_tags[0]?.count || 1;
+                    const size = 0.8 + (tag.count / maxCount) * 1.2;
+                    const hue = (index * 12) % 360;
+                    
+                    return (
+                      <span 
+                        key={index} 
+                        className="cloud-tag-v2"
+                        style={{ 
+                          fontSize: `${size}em`,
+                          backgroundColor: `hsla(${hue}, 70%, 60%, 0.1)`,
+                          borderColor: `hsl(${hue}, 70%, 50%)`,
+                          color: `hsl(${hue}, 70%, 30%)`
+                        }}
+                        title={`${tag.count} games`}
+                      >
+                        {tag._id}
+                        <span className="tag-count-badge">{tag.count}</span>
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             )}
